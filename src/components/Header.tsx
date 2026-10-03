@@ -1,10 +1,9 @@
 import React from 'react';
-import { Trophy, Flame, Sparkles, Video, Lock, Hammer, ShoppingCart, Volume2, VolumeX, Shirt, Palette, Dumbbell, User } from 'lucide-react';
+import { Trophy, Flame, Sparkles, Video, Lock, Hammer, ShoppingCart, Volume2, VolumeX, Shirt, Palette } from 'lucide-react';
 import { ViewMode, UserProfile } from '../types';
 import { sound } from '../utils/audio';
 import { JerseyAvatar } from './JerseyAvatar';
 import { TEAM_COLOR_SCHEMES, DEFAULT_AVATAR_CONFIG } from '../data/teamColorSchemes';
-import { calculateOvr } from './CharacterCreator';
 
 interface HeaderProps {
   currentView: ViewMode;
@@ -139,30 +138,9 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Hammer className="w-4 h-4" />
               <span>Dunk Lab</span>
-              {(profile.totalPointsEarned >= 5000 || profile.points >= 5000) && (
+              {profile.totalPointsEarned >= 1000 && (
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full font-bold border border-emerald-500/40">
                   UNLOCKED
-                </span>
-              )}
-            </button>
-
-            <button
-              id="nav-character-btn"
-              onClick={() => {
-                sound.playBounce();
-                onSelectView('character');
-              }}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                currentView === 'character'
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/20'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60'
-              }`}
-            >
-              <Dumbbell className="w-4 h-4 text-amber-400" />
-              <span>Player HQ</span>
-              {profile.attributes && (
-                <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-full font-black border border-amber-500/40">
-                  {calculateOvr(profile.attributes)} OVR
                 </span>
               )}
             </button>
@@ -301,19 +279,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Hammer className="w-4 h-4 mb-0.5" />
             <span>Dunk Lab</span>
-          </button>
-          <button
-            id="mobile-nav-character"
-            onClick={() => {
-              sound.playBounce();
-              onSelectView('character');
-            }}
-            className={`flex flex-col items-center py-1 px-2 rounded-lg ${
-              currentView === 'character' ? 'text-orange-400 font-bold' : 'text-neutral-400'
-            }`}
-          >
-            <Dumbbell className="w-4 h-4 mb-0.5" />
-            <span>Player HQ</span>
           </button>
           <button
             id="mobile-nav-avatar"

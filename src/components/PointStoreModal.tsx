@@ -95,7 +95,7 @@ export const PointStoreModal: React.FC<PointStoreModalProps> = ({
                 </span>
               </h2>
               <p className="text-xs sm:text-sm text-neutral-400">
-                Get 1,000 Points for $0.99 (unlock 2 dunks) or 5,000 Points for $2.99 (craft a custom dunk)!
+                Unlock legendary moves, boost contest multipliers, or fund your signature Dunk Lab creation!
               </p>
             </div>
           </div>

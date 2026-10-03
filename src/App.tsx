@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ViewMode, DunkMove, HighlightVideo, UserProfile, AvatarConfig, PlayerAttributes, CharacterBio } from './types';
+import { ViewMode, DunkMove, HighlightVideo, UserProfile, AvatarConfig } from './types';
 import { INITIAL_DUNKS } from './data/initialDunks';
 import { INITIAL_HIGHLIGHTS } from './data/mockHighlights';
 import { DEFAULT_AVATAR_CONFIG } from './data/teamColorSchemes';
@@ -10,7 +10,6 @@ import { ContestArena } from './components/ContestArena';
 import { HighlightsFeed } from './components/HighlightsFeed';
 import { DunkVault } from './components/DunkVault';
 import { DunkArchitect } from './components/DunkArchitect';
-import { CharacterCreator } from './components/CharacterCreator';
 import { PointStoreModal } from './components/PointStoreModal';
 import { HighlightRecorder } from './components/HighlightRecorder';
 import { AvatarEditorModal } from './components/AvatarEditorModal';
@@ -19,22 +18,6 @@ const STORAGE_KEYS = {
   PROFILE: 'slamdunk_user_profile_v1',
   DUNKS: 'slamdunk_moves_v1',
   HIGHLIGHTS: 'slamdunk_highlights_v1',
-};
-
-export const DEFAULT_ATTRIBUTES: PlayerAttributes = {
-  verticalLeap: 70,
-  hangtimeFloat: 68,
-  takeoffVelocity: 72,
-  rimImpactForce: 67,
-  timingPrecision: 71,
-};
-
-export const DEFAULT_BIO: CharacterBio = {
-  position: 'Small Forward',
-  archetype: 'Slashing Skywalker',
-  height: `6'6"`,
-  wingspan: `7'0"`,
-  signatureCelebration: 'Sky Salute',
 };
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -49,8 +32,6 @@ const DEFAULT_PROFILE: UserProfile = {
   unlockedDunkIds: ['dunk-tomahawk', 'dunk-backscratcher'],
   customDunksCreated: 0,
   avatar: DEFAULT_AVATAR_CONFIG,
-  attributes: DEFAULT_ATTRIBUTES,
-  bio: DEFAULT_BIO,
 };
 
 export default function App() {
@@ -72,8 +53,6 @@ export default function App() {
           ...DEFAULT_PROFILE,
           ...parsed,
           avatar: parsed.avatar || DEFAULT_AVATAR_CONFIG,
-          attributes: { ...DEFAULT_ATTRIBUTES, ...(parsed.attributes || {}) },
-          bio: { ...DEFAULT_BIO, ...(parsed.bio || {}) },
         };
       }
     } catch (e) {
@@ -86,16 +65,7 @@ export default function App() {
   const [dunks, setDunks] = useState<DunkMove[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.DUNKS);
-      if (saved) {
-        const parsed: DunkMove[] = JSON.parse(saved);
-        // Normalize locked dunks to 500 points cost as required
-        return parsed.map((d) => {
-          if (!d.isCustom && d.cost > 0) {
-            return { ...d, cost: 500 };
-          }
-          return d;
-        });
-      }
+      if (saved) return JSON.parse(saved);
     } catch (e) {
       console.warn('Could not load dunks from localStorage', e);
     }
@@ -214,21 +184,15 @@ export default function App() {
     showToast(`⚡ Unlocked: ${targetDunk?.name || 'New Move'}! Ready for competition.`);
   };
 
-  // 4. Save and share custom created dunk in Dunk Lab (Costs 5,000 points)
-  const DUNK_CREATION_COST = 5000;
+  // 4. Save and share custom created dunk in Dunk Lab
   const handleSaveCustomDunk = (newDunk: DunkMove) => {
-    if (profile.points < DUNK_CREATION_COST) {
-      setIsStoreOpen(true);
-      showToast(`⚠️ 5,000 Points required to craft a custom dunk!`);
-      return;
-    }
-
     setDunks((prev) => [newDunk, ...prev]);
     setProfile((prev) => ({
       ...prev,
-      points: prev.points - DUNK_CREATION_COST,
       unlockedDunkIds: [...prev.unlockedDunkIds, newDunk.id],
       customDunksCreated: prev.customDunksCreated + 1,
+      points: prev.points + 50, // bonus for publishing
+      totalPointsEarned: prev.totalPointsEarned + 50,
     }));
 
     // Also push a showcase card to the community highlights feed
@@ -253,7 +217,7 @@ export default function App() {
     };
 
     setHighlights((prev) => [showcaseHighlight, ...prev]);
-    showToast(`🧪 Signature Move "${newDunk.name}" minted for 5,000 Points!`);
+    showToast(`🧪 Signature Move "${newDunk.name}" minted and equipped to your arsenal!`);
   };
 
   // 5. Collect creator royalties
@@ -385,7 +349,6 @@ export default function App() {
             onOpenStore={() => setIsStoreOpen(true)}
             onNavigateToVault={() => setCurrentView('vault')}
             onNavigateToCreator={() => setCurrentView('creator')}
-            onNavigateToCharacter={() => setCurrentView('character')}
             onOpenAvatarEditor={() => setIsAvatarEditorOpen(true)}
           />
         )}
@@ -423,21 +386,6 @@ export default function App() {
             onNavigateToArena={() => setCurrentView('arena')}
             onCollectRoyalties={handleCollectRoyalties}
             customDunks={customDunks}
-          />
-        )}
-
-        {/* VIEW 5: Character Creator & Attribute Upgrading Studio */}
-        {currentView === 'character' && (
-          <CharacterCreator
-            profile={profile}
-            onUpdateProfile={(updated) => {
-              setProfile((prev) => ({
-                ...prev,
-                ...updated,
-              }));
-            }}
-            onOpenStore={() => setIsStoreOpen(true)}
-            onNavigateToArena={() => setCurrentView('arena')}
           />
         )}
 

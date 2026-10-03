@@ -43,7 +43,7 @@ const AURA_OPTIONS = [
   { id: '#ec4899', label: 'Neon Cyber', bg: 'bg-pink-500' },
 ];
 
-const POINTS_REQUIRED_TO_CREATE = 5000;
+const POINTS_REQUIRED_TO_CREATE = 1000;
 
 export const DunkArchitect: React.FC<DunkArchitectProps> = ({
   profile,
@@ -55,10 +55,8 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
 }) => {
   const isUnlocked = profile.totalPointsEarned >= POINTS_REQUIRED_TO_CREATE || profile.points >= POINTS_REQUIRED_TO_CREATE;
   const progressPercent = Math.min(100, Math.round((Math.max(profile.totalPointsEarned, profile.points) / POINTS_REQUIRED_TO_CREATE) * 100));
-  const canAffordToMint = profile.points >= POINTS_REQUIRED_TO_CREATE;
 
   // Form State
-  const [isSandboxMode, setIsSandboxMode] = useState(false);
   const [dunkName, setDunkName] = useState('The Skywalker Nova');
   const [nickname, setNickname] = useState('The Rim Obliterator');
   const [description, setDescription] = useState('An unstoppable aerial spectacle invented in the Dunk Lab.');
@@ -115,11 +113,6 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
     e.preventDefault();
     if (!dunkName.trim()) return;
 
-    if (profile.points < POINTS_REQUIRED_TO_CREATE) {
-      onOpenStore();
-      return;
-    }
-
     const newMove: DunkMove = {
       id: `custom-${Date.now()}`,
       name: dunkName.trim(),
@@ -156,7 +149,7 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
   };
 
   // If user hasn't earned enough points yet to unlock the lab
-  if (!isUnlocked && !isSandboxMode) {
+  if (!isUnlocked) {
     return (
       <div id="dunk-lab-locked" className="max-w-4xl mx-auto space-y-6">
         <div className="bg-gradient-to-b from-neutral-900 via-neutral-900 to-neutral-950 border border-neutral-800 rounded-3xl p-8 sm:p-12 text-center shadow-2xl relative overflow-hidden">
@@ -166,22 +159,22 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
           </div>
 
           <span className="px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-black uppercase tracking-wider">
-            5,000 Points Required to Create Dunks
+            Dunk Architect License Required
           </span>
 
           <h2 className="text-3xl sm:text-4xl font-black font-display text-white uppercase tracking-wide mt-3 mb-2">
-            The Custom Dunk Lab
+            Unlock The Custom Dunk Lab
           </h2>
 
           <p className="text-sm sm:text-base text-neutral-400 max-w-xl mx-auto leading-relaxed">
-            Architect custom signature dunks, set tailored flight physics, and earn royalties whenever other dunkers perform your creation! It costs 5,000 Dunk Points to invent and mint custom signature moves.
+            When you earn enough points in Slam Dunk Contests, you unlock the ability to architect your own signature moves, set custom flight physics, and earn royalties whenever other dunkers perform or like your creation!
           </p>
 
           {/* Progress Bar Card */}
           <div className="max-w-md mx-auto my-8 p-5 bg-neutral-950/80 rounded-2xl border border-neutral-800">
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2">
-              <span className="text-neutral-400">Your Current Points</span>
-              <span className="text-amber-400">{profile.points.toLocaleString()} / {POINTS_REQUIRED_TO_CREATE.toLocaleString()} PTS</span>
+              <span className="text-neutral-400">Your Lifetime Points</span>
+              <span className="text-amber-400">{Math.max(profile.totalPointsEarned, profile.points).toLocaleString()} / {POINTS_REQUIRED_TO_CREATE.toLocaleString()} PTS</span>
             </div>
 
             <div className="w-full h-4 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800 p-0.5">
@@ -192,34 +185,26 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
             </div>
 
             <div className="text-[11px] text-neutral-400 mt-2">
-              Need {(POINTS_REQUIRED_TO_CREATE - profile.points).toLocaleString()} more points to craft custom dunks!
+              Only {(POINTS_REQUIRED_TO_CREATE - Math.max(profile.totalPointsEarned, profile.points)).toLocaleString()} points left to unlock Dunk Architect!
             </div>
           </div>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={() => setIsSandboxMode(true)}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-750 text-purple-300 border border-purple-500/30 font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-sm"
-            >
-              <Sparkles className="w-4 h-4 text-purple-400" />
-              <span>Design in Sandbox Mode</span>
-            </button>
-
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               onClick={onNavigateToArena}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-850 hover:bg-neutral-800 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Trophy className="w-4 h-4 text-orange-400" />
-              <span>Win Points in Arena</span>
+              <span>Win Contests in Arena</span>
             </button>
 
             <button
               onClick={onOpenStore}
-              className="w-full sm:w-auto px-7 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-neutral-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-neutral-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
             >
               <ShoppingCart className="w-4 h-4 text-neutral-950" />
-              <span>Buy 5,000 Points ($2.99)</span>
+              <span>Buy Points & Fast-Track Unlock</span>
             </button>
           </div>
 
@@ -228,34 +213,10 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
     );
   }
 
-  // Lab is Unlocked or in Sandbox Mode!
+  // Lab is Unlocked!
   return (
     <div id="dunk-lab-unlocked" className="space-y-6">
       
-      {/* Sandbox Notice Banner if under 5,000 points */}
-      {!canAffordToMint && (
-        <div className="bg-neutral-900 border border-amber-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-lg">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-              <Lock className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-bold text-white block sm:inline">5,000 Points Required to Mint Signature Moves</span>
-              <p className="text-neutral-400 text-[11px] mt-0.5">
-                Design and simulate your custom flight mechanics freely! You have {profile.points.toLocaleString()} PTS. Buy 5,000 PTS for $2.99 or win contests to mint.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onOpenStore}
-            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-neutral-950 font-black uppercase text-xs tracking-wider shrink-0 transition-all flex items-center justify-center gap-1.5 shadow-md"
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            <span>Buy 5,000 PTS ($2.99)</span>
-          </button>
-        </div>
-      )}
-
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-neutral-900 via-neutral-850 to-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
@@ -474,30 +435,14 @@ export const DunkArchitect: React.FC<DunkArchitectProps> = ({
           </div>
 
           {/* Mint Button */}
-          <div className="pt-4 border-t border-neutral-800 space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold px-1">
-              <span className="text-neutral-400">Signature Dunk Creation Fee:</span>
-              <span className="text-amber-400 font-bold font-mono">5,000 Dunk Points</span>
-            </div>
-
-            {canAffordToMint ? (
-              <button
-                type="submit"
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-purple-600/30 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-4 h-4 text-white" />
-                <span>Craft & Mint Signature Dunk (Costs 5,000 PTS)</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={onOpenStore}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-neutral-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
-              >
-                <ShoppingCart className="w-4 h-4 text-neutral-950" />
-                <span>Need {(POINTS_REQUIRED_TO_CREATE - profile.points).toLocaleString()} More PTS • Buy 5,000 PTS ($2.99)</span>
-              </button>
-            )}
+          <div className="pt-4 border-t border-neutral-800">
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-purple-600/30 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>Mint & Publish Signature Dunk (+25 PTS Royalties)</span>
+            </button>
           </div>
 
         </form>

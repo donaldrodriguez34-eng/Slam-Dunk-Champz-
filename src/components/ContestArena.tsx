@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, Play, RotateCcw, Sparkles, Flame, CheckCircle, Video, ArrowRight, Shield, Award, Zap, Shirt, Gauge, Film, Camera, Dumbbell, TrendingUp } from 'lucide-react';
+import { Trophy, Play, RotateCcw, Sparkles, Flame, CheckCircle, Video, ArrowRight, Shield, Award, Zap, Shirt, Gauge, Film, Camera } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DunkMove, UserProfile, ContestRound, JudgeScore, HighlightVideo } from '../types';
 import { CELEBRITY_JUDGES, RIVAL_DUNKERS } from '../data/initialDunks';
@@ -7,7 +7,6 @@ import { sound } from '../utils/audio';
 import { JerseyAvatar } from './JerseyAvatar';
 import { DEFAULT_AVATAR_CONFIG } from '../data/teamColorSchemes';
 import { SloMoReplayModal } from './SloMoReplayModal';
-import { calculateOvr } from './CharacterCreator';
 
 interface ContestArenaProps {
   unlockedDunks: DunkMove[];
@@ -17,7 +16,6 @@ interface ContestArenaProps {
   onOpenStore: () => void;
   onNavigateToVault: () => void;
   onNavigateToCreator: () => void;
-  onNavigateToCharacter?: () => void;
   onOpenAvatarEditor?: () => void;
 }
 
@@ -31,7 +29,6 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
   onOpenStore,
   onNavigateToVault,
   onNavigateToCreator,
-  onNavigateToCharacter,
   onOpenAvatarEditor,
 }) => {
   const [selectedDunk, setSelectedDunk] = useState<DunkMove>(unlockedDunks[0] || {} as DunkMove);
@@ -71,16 +68,6 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
   const [pointsAwarded, setPointsAwarded] = useState(0);
   const [highlightSaved, setHighlightSaved] = useState(false);
 
-  // Player attributes & overall rating
-  const attrs = profile.attributes || {
-    verticalLeap: 70,
-    hangtimeFloat: 68,
-    takeoffVelocity: 72,
-    rimImpactForce: 67,
-    timingPrecision: 71,
-  };
-  const playerOvr = calculateOvr(attrs);
-
   const rival = RIVAL_DUNKERS[rivalIndex % RIVAL_DUNKERS.length];
   const animationFrameRef = useRef<number | null>(null);
 
@@ -116,12 +103,11 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
     }
   }, [unlockedDunks, selectedDunk]);
 
-  // Handle meter oscillation in elevation & flush phases (scaled by dunkSpeed and softened by hangtimeFloat)
+  // Handle meter oscillation in elevation & flush phases (scaled by dunkSpeed for slow-mo)
   useEffect(() => {
     if (phase === 'elevation' || phase === 'flush') {
       const baseSpeed = phase === 'elevation' ? 2.5 : 3.2;
-      const floatFactor = Math.max(0.75, 1 - ((attrs.hangtimeFloat - 60) / 40) * 0.2);
-      const speed = baseSpeed * dunkSpeed * floatFactor;
+      const speed = baseSpeed * dunkSpeed;
       const interval = setInterval(() => {
         setMeterValue((prev) => {
           let next = prev + speed * meterDirection;
@@ -138,7 +124,7 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
       }, 16);
       return () => clearInterval(interval);
     }
-  }, [phase, meterDirection, dunkSpeed, attrs.hangtimeFloat]);
+  }, [phase, meterDirection, dunkSpeed]);
 
   // Start dunk attempt
   const startDunkRun = () => {
@@ -156,10 +142,9 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
       sound.playBounce();
     }
 
-    // Step 1: Runway sprint (scaled by dunkSpeed and boosted by takeoffVelocity)
+    // Step 1: Runway sprint (scaled by dunkSpeed)
     let progress = 0;
-    const velBoost = 1 + ((attrs.takeoffVelocity - 60) / 40) * 0.22;
-    const step = 2.5 * dunkSpeed * velBoost;
+    const step = 2.5 * dunkSpeed;
     const runInterval = setInterval(() => {
       progress += step;
       setPlayerPos((p) => ({ ...p, x: 15 + progress * 0.35 }));
@@ -186,16 +171,14 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
       sound.playBounce();
     }
 
-    // Sweet spot tolerance is expanded by timingPrecision
-    const precisionBonus = ((attrs.timingPrecision - 60) / 40) * 8;
-    const distance = Math.max(0, Math.abs(meterValue - 78) - precisionBonus);
+    // Sweet spot is between 68 and 88
+    const distance = Math.abs(meterValue - 78);
     const score = Math.max(0, 100 - distance * 3.5);
     setElevationScore(score);
 
-    // Animate player jumping into air (altitude higher with verticalLeap attribute)
-    const apexBoost = Math.round(((attrs.verticalLeap - 60) / 40) * 12);
-    setPlayerPos({ x: 55, y: Math.max(20, 40 - apexBoost) });
-    setBallPos({ x: 60, y: Math.max(12, 32 - apexBoost) });
+    // Animate player jumping into air
+    setPlayerPos({ x: 55, y: 40 });
+    setBallPos({ x: 60, y: 32 });
     setBallRotation(selectedDunk.difficulty === 'Legendary' ? 720 : 360);
 
     // Proceed to flush window
@@ -206,9 +189,8 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
 
   // User taps meter during Flush
   const handleFlushTap = () => {
-    // Sweet spot expanded by timingPrecision
-    const precisionBonus = ((attrs.timingPrecision - 60) / 40) * 8;
-    const distance = Math.max(0, Math.abs(meterValue - 82) - precisionBonus);
+    // Sweet spot between 72 and 92
+    const distance = Math.abs(meterValue - 82);
     const score = Math.max(0, 100 - distance * 4);
     setFlushScore(score);
 
@@ -259,15 +241,15 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
       else if (timing === 'GOOD') base = 8;
       else base = 6;
 
-      // Small judge personality variance & attribute influence
-      if (judge.name.includes('Shaq') && (selectedDunk.finishStyle.includes('Flush') || attrs.rimImpactForce >= 80)) {
+      // Small judge personality variance
+      if (judge.name.includes('Shaq') && selectedDunk.finishStyle.includes('Flush')) {
         base = Math.min(10, base + 1);
       }
-      if (judge.name.includes('Vince') && (selectedDunk.name.includes('360') || selectedDunk.name.includes('Honey') || attrs.verticalLeap >= 85)) {
-        base = Math.min(10, base + 1);
+      if (judge.name.includes('Vince') && (selectedDunk.name.includes('360') || selectedDunk.name.includes('Honey'))) {
+        base = 10;
       }
-      if (judge.name.includes('Dominique') && (selectedDunk.name.includes('Windmill') || attrs.takeoffVelocity >= 85)) {
-        base = Math.min(10, base + 1);
+      if (judge.name.includes('Dominique') && selectedDunk.name.includes('Windmill')) {
+        base = 10;
       }
 
       // Add comments
@@ -319,8 +301,7 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
         const basePts = 350;
         const perfectBonus = total === 50 ? 150 : 0;
         const difficultyBonus = selectedDunk.difficultyStars * 40;
-        const attributeBonus = Math.round(((attrs.takeoffVelocity - 60) / 40) * 50 + ((attrs.rimImpactForce - 60) / 40) * 35);
-        const earned = Math.round((basePts + perfectBonus + difficultyBonus + attributeBonus) * selectedDunk.scoreMultiplier);
+        const earned = Math.round((basePts + perfectBonus + difficultyBonus) * selectedDunk.scoreMultiplier);
         
         setPointsAwarded(earned);
         onWinContest(earned);
@@ -601,8 +582,8 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
         )}
 
         {/* Stage Top Bar: Move Name & Status Overlay */}
-        <div className="relative z-30 p-4 sm:p-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="relative z-30 p-4 sm:p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <div className="bg-neutral-900/90 border border-neutral-700/80 px-3.5 py-1.5 rounded-xl backdrop-blur-md">
               <span className="text-xs text-neutral-400 font-bold uppercase mr-2">Selected Dunk:</span>
               <span className="text-sm sm:text-base font-black text-white font-display uppercase tracking-wide">
@@ -612,19 +593,6 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
                 {selectedDunk.scoreMultiplier}x
               </span>
             </div>
-
-            {/* Player Attributes Status Badge */}
-            <button
-              type="button"
-              onClick={onNavigateToCharacter}
-              className="bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700/80 hover:border-amber-400/50 px-3 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2 transition-all cursor-pointer shadow-sm text-left group"
-              title="Click to upgrade player attributes with Dunk Points"
-            >
-              <Dumbbell className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-black text-white">{playerOvr} OVR</span>
-              <span className="text-[10px] text-amber-400 font-bold uppercase hidden sm:inline">{profile.bio?.archetype || 'Skywalker'}</span>
-              <span className="text-[9px] text-neutral-400 group-hover:text-orange-400 font-medium">Build +</span>
-            </button>
 
             {selectedDunk.isCustom && (
               <span className="px-2 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-bold flex items-center gap-1">
@@ -674,24 +642,19 @@ export const ContestArena: React.FC<ContestArenaProps> = ({
               <span className="text-amber-400">
                 {phase === 'elevation' ? 'Tap for Max Hangtime' : 'Tap for Perfect Rim Flush'}
               </span>
-              <span className="text-emerald-400 font-mono flex items-center gap-1.5">
-                <span>Green Sweet Spot: {phase === 'elevation' ? '70-86%' : '74-90%'}</span>
-                {attrs.timingPrecision > 70 && (
-                  <span className="text-[10px] text-amber-300 font-bold px-1.5 py-0.2 rounded bg-amber-400/20 border border-amber-400/30">
-                    +{Math.round(((attrs.timingPrecision - 60) / 40) * 8)}% Precision
-                  </span>
-                )}
+              <span className="text-emerald-400 font-mono">
+                {phase === 'elevation' ? 'Green Zone = 75-85%' : 'Green Zone = 78-88%'}
               </span>
             </div>
 
             {/* Gauge Track */}
             <div className="relative h-7 sm:h-9 bg-neutral-900 border border-neutral-700 rounded-xl overflow-hidden flex items-center">
-              {/* Sweet spot target zone widened by timingPrecision */}
+              {/* Sweet spot target zone */}
               <div 
                 className="absolute top-0 bottom-0 bg-gradient-to-r from-emerald-500/40 via-emerald-400/80 to-emerald-500/40 border-x-2 border-emerald-300"
                 style={{
-                  left: phase === 'elevation' ? '68%' : '72%',
-                  width: `${18 + Math.round(((attrs.timingPrecision - 60) / 40) * 12)}%`,
+                  left: phase === 'elevation' ? '70%' : '75%',
+                  width: '18%',
                 }}
               >
                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-neutral-950 uppercase tracking-widest">

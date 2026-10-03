@@ -1,4 +1,4 @@
-export type ViewMode = 'arena' | 'highlights' | 'vault' | 'creator' | 'character' | 'store';
+export type ViewMode = 'arena' | 'highlights' | 'vault' | 'creator' | 'store';
 
 export interface DunkMove {
   id: string;
@@ -89,22 +89,6 @@ export interface AvatarConfig {
   accessoryColor: string;
 }
 
-export interface PlayerAttributes {
-  verticalLeap: number;       // 60 - 99: Increases apex jump height & judge elevation rating
-  hangtimeFloat: number;      // 60 - 99: Extends hangtime in air & smooths meter speed
-  takeoffVelocity: number;    // 60 - 99: Increases runway sprint momentum & multiplier boost
-  rimImpactForce: number;     // 60 - 99: Boosts backboard rattle, crowd excitement & power finish score
-  timingPrecision: number;    // 60 - 99: Expands green sweet-spot target zone on meters
-}
-
-export interface CharacterBio {
-  position: 'Point Guard' | 'Shooting Guard' | 'Small Forward' | 'Power Forward' | 'Center';
-  archetype: 'Slashing Skywalker' | 'Aerospace Wing' | 'Power Rim Destroyer' | 'Freestyle Aerialist' | 'Clutch Hangtime Maestro';
-  height: string;
-  wingspan: string;
-  signatureCelebration: string;
-}
-
 export interface UserProfile {
   name: string;
   handle: string;
@@ -117,8 +101,6 @@ export interface UserProfile {
   unlockedDunkIds: string[];
   customDunksCreated: number;
   avatar: AvatarConfig;
-  attributes: PlayerAttributes;
-  bio: CharacterBio;
 }
 
 export interface StorePackage {
