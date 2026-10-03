@@ -1,0 +1,11 @@
+{
+  "name": "Remix Slam dunk champz ",
+  "description": "Compete in slam dunk contests, customize your team jersey and number, record and share highlights, earn points to unlock moves, and craft custom dunks.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

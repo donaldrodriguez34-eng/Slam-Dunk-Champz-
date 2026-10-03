@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+@keyframes rim-rattle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  20% { transform: translateY(4px) rotate(-1.5deg); }
+  40% { transform: translateY(-2px) rotate(1deg); }
+  60% { transform: translateY(2px) rotate(-0.5deg); }
+  80% { transform: translateY(-1px) rotate(0.5deg); }
+}
+
+.animate-rim-rattle {
+  animation: rim-rattle 0.45s ease-in-out;
+}
+
+@keyframes flash-score {
+  0% { transform: scale(0.7); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-flash-score {
+  animation: flash-score 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes victory-screen-shake {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  10% {
+    transform: translate3d(-10px, 6px, 0) rotate(-1.5deg);
+  }
+  20% {
+    transform: translate3d(10px, -8px, 0) rotate(1.8deg);
+  }
+  30% {
+    transform: translate3d(-9px, 6px, 0) rotate(-1.2deg);
+  }
+  40% {
+    transform: translate3d(8px, -5px, 0) rotate(1deg);
+  }
+  50% {
+    transform: translate3d(-6px, 4px, 0) rotate(-0.7deg);
+  }
+  65% {
+    transform: translate3d(4px, -3px, 0) rotate(0.4deg);
+  }
+  80% {
+    transform: translate3d(-2px, 2px, 0) rotate(-0.2deg);
+  }
+}
+
+.animate-victory-shake {
+  animation: victory-screen-shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  will-change: transform;
+}
+
+@keyframes victory-flash {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.98;
+  }
+  28% {
+    opacity: 0.7;
+  }
+  45% {
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-victory-flash {
+  animation: victory-flash 0.95s ease-out forwards;
+}
+
+@keyframes victory-shockwave {
+  0% {
+    transform: scale(0.15);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.9);
+    opacity: 0;
+  }
+}
+
+.animate-victory-shockwave {
+  animation: victory-shockwave 0.95s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
+}
+

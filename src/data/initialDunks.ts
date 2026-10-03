@@ -1,0 +1,229 @@
+import { DunkMove, StorePackage, JudgeScore } from '../types';
+
+export const INITIAL_DUNKS: DunkMove[] = [
+  {
+    id: 'dunk-tomahawk',
+    name: 'One-Hand Tomahawk',
+    nickname: 'The Sledgehammer',
+    difficulty: 'Easy',
+    difficultyStars: 1,
+    cost: 0,
+    unlocked: true,
+    hangtimeRequired: 1.1,
+    scoreMultiplier: 1.0,
+    description: 'Classic high-elevation cockback tomahawk slam that rocks the arena backboard.',
+    takeoff: 'Straight Line Sprint',
+    inAirMotion: 'Right Arm High Extension',
+    finishStyle: 'Violent One-Hand Flush',
+    auraColor: '#f97316', // Orange
+  },
+  {
+    id: 'dunk-backscratcher',
+    name: 'Two-Hand Backscratcher',
+    nickname: 'The Rim Bender',
+    difficulty: 'Easy',
+    difficultyStars: 2,
+    cost: 0,
+    unlocked: true,
+    hangtimeRequired: 1.2,
+    scoreMultiplier: 1.1,
+    description: 'Brings the basketball completely behind the skull before snapping it down two-handed.',
+    takeoff: 'Two-Foot Power Plant',
+    inAirMotion: 'Behind Head Arch',
+    finishStyle: 'Double Hand Rim Pull',
+    auraColor: '#38bdf8', // Light Blue
+  },
+  {
+    id: 'dunk-windmill',
+    name: 'Eastbay Windmill',
+    nickname: 'The Cyclone',
+    difficulty: 'Medium',
+    difficultyStars: 3,
+    cost: 500,
+    unlocked: false,
+    hangtimeRequired: 1.4,
+    scoreMultiplier: 1.35,
+    description: 'Full 360-degree vertical arm revolution in mid-air with devastating downward force.',
+    takeoff: 'Angle Approach Wing',
+    inAirMotion: 'Full Circular Windmill Rotator',
+    finishStyle: 'High Velocity Throwdown',
+    auraColor: '#eab308', // Yellow
+  },
+  {
+    id: 'dunk-honeydip',
+    name: '360 Honey Dip',
+    nickname: 'The Vince Elbow Hang',
+    difficulty: 'Hard',
+    difficultyStars: 4,
+    cost: 500,
+    unlocked: false,
+    hangtimeRequired: 1.6,
+    scoreMultiplier: 1.65,
+    description: 'Spin 360 degrees mid-air and shove your entire forearm deep into the rim up to the elbow.',
+    takeoff: 'Baseline Spin Takeoff',
+    inAirMotion: '360 Gyro Rotation',
+    finishStyle: 'Elbow In Net Hang',
+    auraColor: '#a855f7', // Purple
+  },
+  {
+    id: 'dunk-between-legs',
+    name: 'Eastbay Between The Legs',
+    nickname: 'The Gravity Defier',
+    difficulty: 'Hard',
+    difficultyStars: 4,
+    cost: 500,
+    unlocked: false,
+    hangtimeRequired: 1.75,
+    scoreMultiplier: 1.85,
+    description: 'Airborne transfer from left to right hand directly beneath the lifted left thigh.',
+    takeoff: 'Full Court Momentum Run',
+    inAirMotion: 'Under-Leg Scissor Weave',
+    finishStyle: 'One-Hand Overhead Snap',
+    auraColor: '#ec4899', // Pink
+  },
+  {
+    id: 'dunk-freethrow',
+    name: 'Free Throw Line Glide',
+    nickname: 'Flight 23',
+    difficulty: 'Extreme',
+    difficultyStars: 5,
+    cost: 500,
+    unlocked: false,
+    hangtimeRequired: 1.95,
+    scoreMultiplier: 2.15,
+    description: 'Leaping cleanly from the charity stripe 15 feet away with majestic gliding hangtime.',
+    takeoff: 'Free Throw Stripe Stomp',
+    inAirMotion: 'Horizontal Float & Kick',
+    finishStyle: 'Glide Finger-Tip Slam',
+    auraColor: '#ef4444', // Red
+  },
+  {
+    id: 'dunk-720-tornado',
+    name: 'Behind-The-Back 720',
+    nickname: 'The Tornado Matrix',
+    difficulty: 'Legendary',
+    difficultyStars: 5,
+    cost: 500,
+    unlocked: false,
+    hangtimeRequired: 2.2,
+    scoreMultiplier: 2.5,
+    description: 'Two full 360 rotations while wrapping the ball behind the spine before an earth-shattering spike.',
+    takeoff: 'Alley-Oop Self Backboard Bounce',
+    inAirMotion: 'Dual Spin & Spine Wrap',
+    finishStyle: 'Reverse Two-Hand Spike',
+    auraColor: '#06b6d4', // Cyan
+  },
+];
+
+export const POINT_PACKAGES: StorePackage[] = [
+  {
+    id: 'pack-starter',
+    points: 1000,
+    bonusPoints: 0,
+    priceUsd: 0.99,
+    tag: 'Starter Boost',
+    perks: ['1,000 Dunk Points for $0.99', 'Instantly unlock 2 moves (500 PTS each)', 'Bronze Player Badge'],
+  },
+  {
+    id: 'pack-creator',
+    points: 5000,
+    bonusPoints: 0,
+    priceUsd: 2.99,
+    popular: true,
+    tag: 'Best Value • Creator Pack',
+    perks: [
+      '5,000 Dunk Points for $2.99',
+      'Craft a Custom Dunk in Dunk Lab (5,000 PTS)',
+      'Or unlock 10 signature dunks in the Vault',
+      'VIP Golden Aura Trail & Creator License'
+    ],
+  },
+  {
+    id: 'pack-superstar',
+    points: 12000,
+    bonusPoints: 1000,
+    priceUsd: 5.99,
+    tag: 'Superstar Bundle',
+    perks: [
+      '12,000 + 1,000 Bonus Points ($5.99)',
+      'Multiple Dunk Lab Creations',
+      'Unlock All Moves in the Vault',
+      'Exclusive Fire Ball Aura Trail'
+    ],
+  },
+  {
+    id: 'pack-goat',
+    points: 25000,
+    bonusPoints: 5000,
+    priceUsd: 9.99,
+    tag: 'Hall of Fame',
+    perks: [
+      '25,000 + 5,000 Bonus Points ($9.99)',
+      'Unlimited Custom Dunks & In-Air Tricks',
+      '2x Royalties on Community Highlights',
+      'Permanent Hall of Fame Legend Status'
+    ],
+  },
+];
+
+export const CELEBRITY_JUDGES = [
+  {
+    id: 'judge-1',
+    name: "Dominique 'The Highlight'",
+    role: 'Hall of Fame Dunk Legend',
+    avatar: '🦅',
+    personality: 'Loves windmill power and ferocious rim violence.',
+  },
+  {
+    id: 'judge-2',
+    name: "Spud 'Sky Walker'",
+    role: 'Underdog Champion',
+    avatar: '🚀',
+    personality: 'Admires hangtime, elevation, and underdog creativity.',
+  },
+  {
+    id: 'judge-3',
+    name: "Vince 'Half-Man'",
+    role: 'Contest Royalty 2000',
+    avatar: '👑',
+    personality: 'Looks for crisp execution, style, and iconic finish.',
+  },
+  {
+    id: 'judge-4',
+    name: "Candace 'The Vision'",
+    role: 'WNBA Legend & Analyst',
+    avatar: '⚡',
+    personality: 'Scores technical difficulty, clean catches, and footwork.',
+  },
+  {
+    id: 'judge-5',
+    name: "Shaq 'The Diesel'",
+    role: 'Backboard Destroyer',
+    avatar: '💥',
+    personality: 'Demands rim-bending force and showmanship!',
+  },
+];
+
+export const RIVAL_DUNKERS = [
+  {
+    name: 'Marcus "Aero" Vance',
+    team: 'Skyline Ballers',
+    avatar: '⚡',
+    specialty: '360 Windmills',
+    baseScore: 43,
+  },
+  {
+    name: 'Darius "Flight" King',
+    team: 'Oakland Airborne',
+    avatar: '🦅',
+    specialty: 'Between the legs',
+    baseScore: 46,
+  },
+  {
+    name: 'Zion "Meteor" Cole',
+    team: 'Gotham Slammers',
+    avatar: '🔥',
+    specialty: 'Power Tomahawks',
+    baseScore: 48,
+  },
+];
